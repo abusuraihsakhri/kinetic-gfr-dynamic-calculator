@@ -80,9 +80,16 @@ def main(argv=None):
         return 0
 
     if args.command == "batch":
+        import os
+        if not os.path.isfile(args.input):
+            print(f"Error: Input CSV not found: {args.input}", file=sys.stderr)
+            return 1
         with open(args.input, mode="r", encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
             fieldnames = list(reader.fieldnames or [])
+            if not fieldnames:
+                print(f"Error: Input CSV is empty or has no headers: {args.input}", file=sys.stderr)
+                return 1
             rows = list(reader)
 
         out_fields = fieldnames + ["overall_urgency", "integrity_status", "total_alerts", "audit_hash"]

@@ -1,7 +1,6 @@
 """
 Prometheus Operational Metrics Exporter for kinetic-gfr-dynamic-calculator.
 """
-import time
 from typing import Dict, Any
 
 class SystemMetricsCollector:

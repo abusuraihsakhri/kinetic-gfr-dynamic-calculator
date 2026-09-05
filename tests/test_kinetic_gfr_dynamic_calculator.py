@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pytest
-from agents.base import PHIGuard, AuditLogger, SecurityException
+from agents.base import PHIGuard, AuditLogger, SecurityException, AuditTrail
 from agents.models import SystemTaskPayload, UrgencyLevel, SystemIntegrityStatus
 from agents.workers import InvariantQCWorker, SafetyEscalationWorker, ProtocolConformanceWorker
 from agents.supervisor import SystemSupervisor
@@ -21,6 +21,31 @@ def test_phi_guard_enforcement():
 
     # Clean text passes
     PHIGuard.assert_no_phi("Analytical assay specimen KEY-001 optimal")
+
+
+def test_phi_guard_ssn_detection():
+    """SSN pattern should be detected and blocked."""
+    with pytest.raises(SecurityException):
+        PHIGuard.assert_no_phi("Patient SSN: 123-45-6789")
+
+
+def test_phi_guard_phone_detection():
+    """Phone number pattern should be detected and blocked."""
+    with pytest.raises(SecurityException):
+        PHIGuard.assert_no_phi("Contact: (555) 123-4567")
+
+
+def test_phi_guard_email_detection():
+    """Email pattern should be detected and blocked."""
+    with pytest.raises(SecurityException):
+        PHIGuard.assert_no_phi("Email: patient@hospital.org")
+
+
+def test_phi_redact():
+    """PHIGuard.redact_phi should replace PII with placeholder."""
+    redacted = PHIGuard.redact_phi("Patient MRN-12345678 is here")
+    assert "MRN-12345678" not in redacted
+    assert "[REDACTED_IDENTIFIER]" in redacted
 
 
 def test_specialized_workers():
@@ -40,6 +65,14 @@ def test_specialized_workers():
     p3 = SystemTaskPayload(task_id="T3", target_identifier="KEY-03", primary_metric=10.0, status_descriptor="DISCORDANT_ANOMALY")
     alerts3 = ProtocolConformanceWorker.evaluate(p3)
     assert len(alerts3) == 1
+
+
+def test_workers_no_alerts_on_nominal():
+    """Workers should not raise alerts for nominal payloads."""
+    p = SystemTaskPayload(task_id="T-NOM", target_identifier="KEY-NOM", primary_metric=10.0, status_descriptor="NOMINAL")
+    assert len(InvariantQCWorker.evaluate(p)) == 0
+    assert len(SafetyEscalationWorker.evaluate(p)) == 0
+    assert len(ProtocolConformanceWorker.evaluate(p)) == 0
 
 
 def test_supervisor_consensus_and_audit():
@@ -63,3 +96,55 @@ def test_supervisor_consensus_and_audit():
     assert main(["audit", "--task-id", "CLI-TEST-01"]) == 0
     assert main(["chat", "Explain", "specifications"]) == 0
     assert main(["verify-audit"]) == 0
+
+
+def test_supervisor_critical_escalation():
+    """Critical flag should result in CRITICAL_STAT urgency."""
+    supervisor = SystemSupervisor(model_provider="mock")
+    payload = SystemTaskPayload(
+        task_id="TASK-CRIT",
+        target_identifier="KEY-CRIT",
+        primary_metric=30.0,
+        secondary_metric=15.0,
+        is_critical_flag=True,
+    )
+    dossier = supervisor.process_task(payload)
+    assert dossier.overall_urgency == UrgencyLevel.CRITICAL_STAT
+    assert dossier.integrity_status == SystemIntegrityStatus.RECALIBRATION_REQUIRED
+
+
+def test_supervisor_phi_rejection():
+    """PHI in task_id should be rejected."""
+    supervisor = SystemSupervisor(model_provider="mock")
+    payload = SystemTaskPayload(
+        task_id="Patient MRN-12345678",
+        target_identifier="KEY-01",
+        primary_metric=10.0,
+    )
+    with pytest.raises(SecurityException):
+        supervisor.process_task(payload)
+
+
+def test_audit_trail_integrity():
+    """Audit trail should maintain cryptographic chain integrity."""
+    trail = AuditTrail(secret_key="test-key-for-integrity")
+    trail.log("test", "tier1", "EVENT_1", {"data": "value1"})
+    trail.log("test", "tier1", "EVENT_2", {"data": "value2"})
+    assert trail.verify_integrity() is True
+    assert len(trail.get_trail()) == 2
+
+
+def test_audit_trail_tamper_detection():
+    """Tampered audit trail should fail integrity check."""
+    trail = AuditTrail(secret_key="test-key-for-tamper")
+    trail.log("test", "tier1", "EVENT_1", {"data": "value1"})
+    trail.log("test", "tier1", "EVENT_2", {"data": "value2"})
+    # Tamper with the first entry
+    trail.logs[0]["payload_hash"] = "tampered_hash"
+    assert trail.verify_integrity() is False
+
+
+def test_cli_batch_missing_file():
+    """CLI batch command should return error code for missing file."""
+    result = main(["batch", "-i", "nonexistent_file_12345.csv"])
+    assert result == 1
