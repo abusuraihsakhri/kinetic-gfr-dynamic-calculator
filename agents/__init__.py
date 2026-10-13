@@ -1,7 +1,2 @@
-"""
-Kinetic Gfr Dynamic Calculator — Enterprise Automated Analytical Suite.
-Domain: Clinical & Biomedical AI
-Standard: CAP / CLSI / ISO Standards
-
-"""
-__version__ = "3.0.0-ENTERPRISE"
+"""Legacy demonstration agent components (not clinically validated)."""
+__version__ = "3.1.0"
