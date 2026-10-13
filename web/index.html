@@ -1,236 +1,168 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kinetic Gfr Dynamic Calculator — Operations Console</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #090d16;
-            --card: #111827;
-            --border: #1f293d;
-            --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.25);
-            --text: #f3f4f6;
-            --text-muted: #9ca3af;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --success: #10b981;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            padding: 2rem;
-            min-height: 100vh;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        .header-title h1 { font-size: 1.6rem; font-weight: 700; color: #fff; }
-        .header-title p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; }
-        .badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            background: var(--accent-glow);
-            color: var(--accent);
-            border: 1px solid var(--accent);
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 1.5rem;
-        }
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-        .card h2 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; }
-        input, select, textarea {
-            width: 100%;
-            padding: 0.65rem 0.9rem;
-            background: #0d1322;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: #fff;
-            font-family: inherit;
-            font-size: 0.9rem;
-        }
-        input:focus, textarea:focus { outline: none; border-color: var(--accent); }
-        .btn {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            padding: 0.7rem 1.4rem;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            width: 100%;
-        }
-        .btn:hover { background: #2563eb; }
-        .terminal {
-            background: #060911;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            color: #10b981;
-            height: 380px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-        }
-        .metrics-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .metric-box {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-        }
-        .metric-val { font-size: 1.4rem; font-weight: 700; color: #fff; margin-top: 0.25rem; }
-        .metric-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Educational Chen 2013 kinetic GFR calculator for changing serum creatinine.">
+  <title>Kinetic GFR | Chen 2013</title>
+  <style>
+    :root { color-scheme: light; --ink:#192b3c; --muted:#4b6478; --border:#cad8e1; --panel:#fff; --bg:#f4f7fa; --accent:#075d89; --danger:#a01d27; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif; }
+    header,main,footer { max-width:1080px; margin:auto; padding:24px; }
+    header { padding-top:38px; padding-bottom:12px; }
+    h1 { font-size:clamp(1.7rem,4vw,2.5rem); line-height:1.2; margin:0 0 8px; letter-spacing:-.035em; }
+    h2 { font-size:1.16rem; margin:0 0 18px; }
+    p { margin:8px 0 14px; }
+    .lead { max-width:790px; color:var(--muted); }
+    .layout { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(285px,.9fr); gap:20px; }
+    .panel { background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:24px; box-shadow:0 3px 16px #1a344514; }
+    .fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; }
+    .field { min-width:0; }
+    label { display:block; font-weight:650; font-size:.9rem; margin-bottom:5px; }
+    .hint { display:block; color:var(--muted); font-size:.79rem; font-weight:400; }
+    input,select { width:100%; padding:10px 12px; border:1px solid #90aabd; border-radius:7px; color:var(--ink); background:#fff; font:inherit; }
+    input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible { outline:3px solid #3c95ce; outline-offset:2px; }
+    .wide { grid-column:1/-1; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:22px; }
+    button { border:1px solid var(--accent); border-radius:7px; background:var(--accent); color:white; padding:10px 16px; font:600 .95rem system-ui; cursor:pointer; }
+    button.secondary { color:var(--accent); background:white; }
+    button:disabled { opacity:.52; cursor:not-allowed; }
+    .result { background:#e9f4f9; border:1px solid #a0c5d9; padding:20px; border-radius:10px; margin:12px 0 16px; }
+    .number { font-size:clamp(2.1rem,6vw,3.2rem); line-height:1.1; font-weight:750; color:#084966; font-variant-numeric:tabular-nums; }
+    .muted { color:var(--muted); }
+    .error { color:var(--danger); font-weight:600; min-height:1.4em; }
+    dl { display:grid; grid-template-columns:1fr auto; gap:9px 8px; margin:16px 0; }
+    dt { color:var(--muted); } dd { margin:0; font-weight:650; font-variant-numeric:tabular-nums; }
+    .notice { background:#fff7e8; border-left:4px solid #ae6e05; padding:12px 15px; margin:18px 0; font-size:.9rem; }
+    .details { margin-top:20px; }
+    code { word-break:break-word; background:#e8eef2; padding:2px 5px; border-radius:3px; }
+    footer { font-size:.87rem; color:var(--muted); }
+    a { color:var(--accent); text-underline-offset:3px; }
+    @media(max-width:760px) { .layout { grid-template-columns:1fr; } header,main,footer { padding:16px; } header { padding-top:26px; } }
+    @media(max-width:440px) { .fields { grid-template-columns:1fr; } .panel { padding:18px; } }
+  </style>
 </head>
 <body>
+  <header>
+    <h1>Kinetic GFR calculator</h1>
+    <p class="lead">Estimate renal clearance while serum creatinine is changing, using the Chen (2013) kinetic equation. Calculation takes place entirely in your browser.</p>
+  </header>
+  <main>
+    <div class="layout">
+      <section class="panel" aria-labelledby="input-heading">
+        <h2 id="input-heading">Inputs</h2>
+        <form id="calculator">
+          <div class="fields">
+            <div class="field wide">
+              <label for="unit">Creatinine units</label>
+              <select id="unit" name="unit"><option value="mg/dL">mg/dL</option><option value="umol/L">µmol/L</option></select>
+            </div>
+            <div class="field">
+              <label for="steady_state_creatinine">Steady-state creatinine <span class="hint">Before the acute change</span></label>
+              <input required type="number" min="0" step="any" id="steady_state_creatinine" name="steady_state_creatinine" value="1">
+            </div>
+            <div class="field">
+              <label for="baseline_gfr">Paired baseline eGFR / CrCl <span class="hint">At the steady-state creatinine</span></label>
+              <input required type="number" min="0" step="any" id="baseline_gfr" name="baseline_gfr" value="90">
+            </div>
+            <div class="field">
+              <label for="creatinine_1">Earlier creatinine <span class="hint">First measurement</span></label>
+              <input required type="number" min="0" step="any" id="creatinine_1" name="creatinine_1" value="1.8">
+            </div>
+            <div class="field">
+              <label for="creatinine_2">Later creatinine <span class="hint">Second measurement</span></label>
+              <input required type="number" min="0" step="any" id="creatinine_2" name="creatinine_2" value="2.4">
+            </div>
+            <div class="field">
+              <label for="hours">Time interval <span class="hint">Hours between measurements</span></label>
+              <input required type="number" min="0" step="any" id="hours" name="hours" value="24">
+            </div>
+            <div class="field">
+              <label for="max_creatinine_rise_per_day">Maximum anuric rise <span class="hint">mg/dL per day; assumption, not measured</span></label>
+              <input required type="number" min="0" step="any" id="max_creatinine_rise_per_day" name="max_creatinine_rise_per_day" value="1.5">
+            </div>
+          </div>
+          <div class="actions">
+            <button type="submit">Calculate kinetic GFR</button>
+            <button class="secondary" type="reset">Reset</button>
+          </div>
+        </form>
+        <p role="alert" id="error" class="error"></p>
+      </section>
 
-    <div class="header">
-        <div class="header-title">
-            <h1>Kinetic Gfr Dynamic Calculator</h1>
-            <p>Domain: Clinical & Cryptographic AI | Standard: CAP / CLSI / NIST Standards | LabMind-Atlas Architecture</p>
+      <section class="panel" aria-labelledby="results-heading">
+        <h2 id="results-heading">Estimated kinetic clearance</h2>
+        <div class="result" aria-live="polite" aria-atomic="true">
+          <div id="value" class="number">—</div>
+          <div id="unit-label" class="muted">mL/min or mL/min/1.73 m², matching baseline</div>
         </div>
-        <div>
-            <span class="badge">Air-Gapped Active</span>
-            <span class="badge" style="background: rgba(16,185,129,0.2); color: #10b981; border-color: #10b981;">Zero-PHI Guard Active</span>
-        </div>
+        <p id="status" class="muted">Enter a paired baseline and two sequential creatinine measurements.</p>
+        <dl>
+          <dt>Mean creatinine</dt><dd id="mean">—</dd>
+          <dt>Creatinine change</dt><dd id="delta">—</dd>
+          <dt>Kinetic adjustment factor</dt><dd id="factor">—</dd>
+        </dl>
+        <button id="export" type="button" class="secondary" disabled>Export result CSV</button>
+        <div class="notice"><strong>Not a treatment decision rule.</strong> Kinetic GFR is an estimate, not measured clearance or KDIGO AKI staging. Interpret in clinical context; fluid shifts and changing creatinine generation can invalidate the assumptions.</div>
+      </section>
     </div>
 
-    <div class="metrics-bar">
-        <div class="metric-box">
-            <div class="metric-label">System Status</div>
-            <div class="metric-val" style="color: var(--success);" id="m-status">OPTIMAL</div>
-        </div>
-        <div class="metric-box">
-            <div class="metric-label">Tasks Processed</div>
-            <div class="metric-val" id="m-tasks">142</div>
-        </div>
-        <div class="metric-box">
-            <div class="metric-label">Audit Blocks Signed</div>
-            <div class="metric-val" id="m-audit">142</div>
-        </div>
-        <div class="metric-box">
-            <div class="metric-label">PHI Interceptions</div>
-            <div class="metric-val" style="color: var(--accent);" id="m-phi">0</div>
-        </div>
-    </div>
-
-    <div class="grid">
-        <div class="card">
-            <h2>⚙️ Dispatch Distributed Component Audit</h2>
-            <div class="form-group">
-                <label>Task / Sample ID</label>
-                <input type="text" id="task_id" value="TASK-2026-LIVE-01">
-            </div>
-            <div class="form-group">
-                <label>Target Identifier</label>
-                <input type="text" id="target_id" value="SPECIMEN-ALPHA-77">
-            </div>
-            <div class="form-group">
-                <label>Primary Measurement / Value</label>
-                <input type="number" id="primary_metric" value="29.4" step="0.1">
-            </div>
-            <div class="form-group">
-                <label>Secondary Metric / Kinetic Index</label>
-                <input type="number" id="secondary_metric" value="14.8" step="0.1">
-            </div>
-            <div class="form-group">
-                <label>Status / Phenotype Descriptor</label>
-                <input type="text" id="status_descriptor" value="DISCORDANT_ANOMALY">
-            </div>
-            <div class="form-group">
-                <label><input type="checkbox" id="is_critical" checked> Trigger Emergency / Critical Flag</label>
-            </div>
-            <button class="btn" onclick="runAudit()">Execute Distributed Component Audit</button>
-        </div>
-
-        <div class="card">
-            <h2>📊 Real-Time Consensus Dossier & Audit Log</h2>
-            <div class="terminal" id="outputConsole">// Kinetic Gfr Dynamic Calculator Operations Console Ready
-// Connection established with Air-Gapped Supervisor
-// Cryptographic HMAC-SHA256 audit ledger loaded.
-// Ready for live task payload dispatch...</div>
-        </div>
-    </div>
-
-    <script>
-        async function runAudit() {
-            const consoleEl = document.getElementById('outputConsole');
-            consoleEl.innerText = "// Dispatching task across specialized workers...
-// Invoking InvariantQCWorker, SafetyEscalationWorker, ProtocolWorker...";
-
-            const payload = {
-                task_id: document.getElementById('task_id').value,
-                target_identifier: document.getElementById('target_id').value,
-                primary_metric: parseFloat(document.getElementById('primary_metric').value),
-                secondary_metric: parseFloat(document.getElementById('secondary_metric').value),
-                status_descriptor: document.getElementById('status_descriptor').value,
-                is_critical_flag: document.getElementById('is_critical').checked
-            };
-
-            try {
-                const res = await fetch('/api/audit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                consoleEl.innerText = JSON.stringify(data, null, 2);
-                document.getElementById('m-tasks').innerText = parseInt(document.getElementById('m-tasks').innerText) + 1;
-                document.getElementById('m-audit').innerText = parseInt(document.getElementById('m-audit').innerText) + 1;
-            } catch (err) {
-                consoleEl.innerText = "// Offline / Simulation Output:\n" + JSON.stringify({
-                    dossier_id: "DOSSIER-SIM-" + Math.floor(Math.random()*10000),
-                    system: "kinetic-gfr-dynamic-calculator",
-                    domain: "Clinical & Cryptographic AI",
-                    task_id: payload.task_id,
-                    overall_urgency: payload.is_critical_flag ? "CRITICAL_STAT_PANIC" : "ELEVATED_RISK",
-                    integrity_status: "DISCORDANT_ANOMALY",
-                    alerts: [
-                        { worker: "InvariantQCWorker", alert: "Primary metric exceeds upper reference bound" },
-                        { worker: "SafetyEscalationWorker", alert: "Critical emergency interlock flag active" }
-                    ],
-                    audit_hash: "HMAC_SHA256_e83f9a72b941d6c381f9"
-                }, null, 2);
-            }
-        }
-    </script>
+    <section class="panel details" aria-labelledby="method-heading">
+      <h2 id="method-heading">Method and limitations</h2>
+      <p><code>KeGFR = (SCr steady × GFR steady / mean SCr) × [1 − 24 × (SCr₂ − SCr₁) / (hours × max rise/day)]</code></p>
+      <p>Baseline GFR or creatinine clearance must correspond to the entered steady-state creatinine. The result retains the baseline estimate's normalization: do not treat an indexed eGFR (mL/min/1.73 m²) as absolute mL/min for dosing without appropriate assessment. The maximum anuric rise defaults to an illustrative 1.5 mg/dL/day; it varies between patients. Impossible negative estimates are rejected instead of presented as physiologic.</p>
+      <p><strong>Reference:</strong> Chen S. Retooling the creatinine clearance equation to estimate kinetic GFR when the plasma creatinine is changing acutely. <em>J Am Soc Nephrol.</em> 2013;24:877–888. <a href="https://pubmed.ncbi.nlm.nih.gov/23704286/" target="_blank" rel="noopener noreferrer">PMID 23704286</a>.</p>
+      <p><strong>Privacy:</strong> No accounts, cookies, analytics, server API calls, or local storage. Inputs stay in the current browser tab. Do not enter identifiable patient information.</p>
+    </section>
+  </main>
+  <footer>Educational and research use only · <a href="https://github.com/abusuraihsakhri/kinetic-gfr-dynamic-calculator">Source code</a></footer>
+  <script src="./kinetic.js"></script>
+  <script>
+    'use strict';
+    const form = document.getElementById('calculator');
+    const exportButton = document.getElementById('export');
+    let last = null;
+    const get = (id) => document.getElementById(id);
+    function clear() {
+      last = null;
+      get('value').textContent = '—';
+      get('mean').textContent = '—';
+      get('delta').textContent = '—';
+      get('factor').textContent = '—';
+      get('status').textContent = 'Enter a paired baseline and two sequential creatinine measurements.';
+      get('error').textContent = '';
+      exportButton.disabled = true;
+    }
+    form.addEventListener('reset', () => { setTimeout(clear, 0); });
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      clear();
+      const values = Object.fromEntries(new FormData(form));
+      try {
+        const output = KineticGFR.calculate(values);
+        last = { ...values, ...output };
+        get('value').textContent = String(output.kegfr);
+        get('mean').textContent = output.mean_creatinine + ' ' + (values.unit === 'umol/L' ? 'µmol/L' : 'mg/dL');
+        get('delta').textContent = output.creatinine_change + ' ' + (values.unit === 'umol/L' ? 'µmol/L' : 'mg/dL');
+        get('factor').textContent = String(output.kinetic_factor);
+        get('status').textContent = 'Estimated clearance; units match the baseline GFR / CrCl entered.';
+        exportButton.disabled = false;
+      } catch (error) {
+        get('error').textContent = error.message;
+        get('status').textContent = 'No valid result calculated.';
+      }
+    });
+    exportButton.addEventListener('click', () => {
+      if (!last) return;
+      const keys = ['steady_state_creatinine','baseline_gfr','creatinine_1','creatinine_2','hours','max_creatinine_rise_per_day','unit','kegfr','kinetic_factor'];
+      const csv = keys.join(',') + '\r\n' + keys.map((key) => JSON.stringify(String(last[key]))).join(',') + '\r\n';
+      const url = URL.createObjectURL(new Blob([csv], {type: 'text/csv;charset=utf-8'}));
+      const a = document.createElement('a');
+      a.href = url; a.download = 'kinetic-gfr.csv';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    });
+  </script>
 </body>
 </html>
