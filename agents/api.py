@@ -2,7 +2,8 @@
 FastAPI REST API Server for Kinetic Gfr Dynamic Calculator.
 """
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from kinetic_gfr import calculate_metrics
 from .base import AuditLogger, PHIGuard
 from .models import SystemTaskPayload, ConsensusDossier
 from .supervisor import SystemSupervisor
@@ -52,3 +53,22 @@ def api_chat(req: ChatRequest):
 @app.get("/api/audit/logs")
 def api_audit_logs():
     return {"audit_trail": AuditLogger.get_trail(), "verified": AuditLogger.verify_integrity()}
+
+
+class KineticGFRRequest(BaseModel):
+    steady_state_creatinine: float = Field(gt=0, allow_inf_nan=False)
+    baseline_gfr: float = Field(gt=0, allow_inf_nan=False)
+    creatinine_1: float = Field(gt=0, allow_inf_nan=False)
+    creatinine_2: float = Field(gt=0, allow_inf_nan=False)
+    hours: float = Field(gt=0, allow_inf_nan=False)
+    max_creatinine_rise_per_day: float = Field(default=1.5, gt=0, allow_inf_nan=False)
+    unit: str = "mg/dL"
+
+
+@app.post("/api/kinetic-gfr")
+def api_kinetic_gfr(req: KineticGFRRequest):
+    """Clinical-domain calculation only; no task identifiers or PHI."""
+    try:
+        return calculate_metrics(**req.model_dump())
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
