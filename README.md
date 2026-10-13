@@ -6,7 +6,7 @@ A kinetic estimated glomerular filtration rate (KeGFR) calculator for changing s
 
 ## Calculate in a browser
 
-Open `web/index.html` in a modern browser. No server, installation, Pyodide, external JavaScript, or internet connection is required. The page supports mg/dL and µmol/L creatinine values and exports the current result as CSV. A GitHub Pages deployment workflow is included; a live link will be provided after its deployment is verified.
+Open `web/index.html` in a modern browser. No server, installation, Pyodide, external JavaScript, or internet connection is required. The page supports mg/dL and µmol/L creatinine values and exports the current result as CSV. A GitHub Pages deployment workflow is included, but no public deployment is claimed until the Pages workflow and live application are verified.
 
 ## Model
 
