@@ -1,186 +1,72 @@
-# Kinetic Gfr Dynamic Calculator
+# Kinetic GFR Dynamic Calculator
 
-> **Domain:** Clinical Decision Support & Biomedical Computing  
-> **Reference Guidelines & Standards:** Standard Clinical Formulations & ISO/IEC Quality Frameworks
+A kinetic estimated glomerular filtration rate (KeGFR) calculator for changing serum creatinine, implementing the algebraic equation proposed by Chen (2013). Includes a dependency-free browser calculator, Python CLI and batch processor, and a FastAPI endpoint.
 
-<div align="center">
+**Scope:** Educational and research calculations. KeGFR is not measured GFR, an AKI stage, or an independent drug-dosing/treatment recommendation. Review clinical assumptions and context.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB.svg?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688.svg?logo=fastapi&logoColor=white)
-![Audit Trail](https://img.shields.io/badge/Audit-HMAC--SHA256_Tamper--Evident-brightgreen.svg)
-![Zero-PHI Guard](https://img.shields.io/badge/Guard-Zero--PHI_Outbound-blue.svg)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker&logoColor=white)
+## Calculate in a browser
 
-</div>
+Open `web/index.html` in a modern browser. No server, installation, Pyodide, external JavaScript, or internet connection is required. The page supports mg/dL and µmol/L creatinine values and exports the current result as CSV. A GitHub Pages deployment workflow is included; a live link will be provided after its deployment is verified.
 
----
+## Model
 
-## Overview
-
-Kinetic eGFR (KeGFR) for Rapidly Changing Creatinine. Calculates real-time dynamic glomerular filtration during acute kidney injury when steady-state CKD-EPI fails.
-
-- Zero-dependency Python implementation with single and batch evaluation
-- FastAPI REST API with OpenAPI 3.1 specification
-- HMAC-SHA256 tamper-evident audit trail
-- Zero-PHI outbound guard for HIPAA compliance
-
-**Author:** Dr. Abu Suraih Sakhri  
-**License:** MIT
-
----
-
-## Installation
-
-### From Source
-```bash
-git clone https://github.com/abusuraihsakhri/kinetic-gfr-dynamic-calculator.git
-cd kinetic-gfr-dynamic-calculator
-pip install -r requirements.txt
+```text
+MeanSCr = (SCr1 + SCr2) / 2
+KeGFR = (SteadySCr × BaselineGFR / MeanSCr)
+       × [1 − 24 × (SCr2 − SCr1) / (hours × max_rise_per_day)]
 ```
 
-### Using Docker
+The baseline GFR (or creatinine clearance) must correspond to the entered *steady-state* creatinine. Earlier/later creatinine values must be chronologically ordered. The maximum anuric rise defaults to an illustrative **1.5 mg/dL/day**, not a patient-specific measured rate. All creatinine inputs use the selected unit (mg/dL or µmol/L); the maximum rise input remains in mg/dL/day. An implausible negative kinetic correction is rejected.
+
+**Units:** Output has the same normalization as the supplied baseline clearance: mL/min or mL/min/1.73 m². Indexed eGFR is not interchangeable with absolute clearance for dosing. The estimate assumes relatively stable creatinine production and distribution volume; significant volume changes can make it misleading.
+
+**Reference:** Chen S. Retooling the creatinine clearance equation to estimate kinetic GFR when the plasma creatinine is changing acutely. *J Am Soc Nephrol*. 2013;24(6):877–888. [PMID: 23704286](https://pubmed.ncbi.nlm.nih.gov/23704286/).
+
+## Python CLI
+
+Requires Python 3.10 or newer.
+
 ```bash
-docker build -t kinetic-gfr-dynamic-calculator .
-docker run -p 8000:8000 -e AUDIT_SECRET_KEY=your-secret-key kinetic-gfr-dynamic-calculator
+python -m pip install -e .
+kinetic-gfr single --steady-state-creatinine 1 --baseline-gfr 90 \
+  --creatinine-1 1.8 --creatinine-2 2.4 --hours 24
+# KeGFR: 25.71 in the same clearance units as baseline_gfr
+kinetic-gfr batch -i sample.csv -o results.csv
 ```
 
-### Using Docker Compose
+The core `kinetic_gfr.py` module itself needs only the Python standard library. CSV columns required: `steady_state_creatinine,baseline_gfr,creatinine_1,creatinine_2,hours`. Optional: `max_creatinine_rise_per_day,unit`. Invalid rows fail with the row number before output is written. Never use the same file for input and output.
+
+## API and legacy tooling
+
 ```bash
-AUDIT_SECRET_KEY=your-secret-key docker-compose up
-```
-
----
-
-## Configuration
-
-| Environment Variable | Description | Default |
-|:---------------------|:------------|:--------|
-| `AUDIT_SECRET_KEY` | Secret key for HMAC-SHA256 audit trail (required in production) | Auto-generated (dev only) |
-| `MODEL_PROVIDER` | LLM provider (`mock`, `ollama`, `claude`, `openai`) | `mock` |
-
-> **Security Note:** Always set `AUDIT_SECRET_KEY` in production. The application will warn and use a random key if not set.
-
----
-
-## Usage
-
-### CLI - Single Evaluation
-```bash
-python kinetic_gfr.py single --v1 14.5 --v2 4.2 --v3 1.8
-```
-
-### CLI - Batch Processing
-```bash
-python kinetic_gfr.py batch -i sample.csv -o results.csv
-```
-
-### Enterprise CLI (Full Feature Set)
-```bash
-# Run single task audit
-python cli.py audit --task-id TASK-001 --primary 28.5 --secondary 14.2
-
-# Batch processing
-python cli.py batch -i sample.csv -o results.csv
-
-# Verify audit trail integrity
-python cli.py verify-audit
-
-# Launch REST API server
 python cli.py serve --host 127.0.0.1 --port 8000
+# POST http://127.0.0.1:8000/api/kinetic-gfr
+# GET  http://127.0.0.1:8000/docs
 ```
 
-### REST API Endpoints
+Sample request:
 
-| Method | Endpoint | Description |
-|:-------|:---------|:------------|
-| GET | `/health` | Health check |
-| GET | `/metrics` | Prometheus metrics |
-| POST | `/api/audit` | Process task payload |
-| POST | `/api/chat` | Supervisory chat query |
-| GET | `/api/audit/logs` | Audit trail with integrity verification |
+```json
+{"steady_state_creatinine":1,"baseline_gfr":90,"creatinine_1":1.8,"creatinine_2":2.4,"hours":24}
+```
 
-### Example API Request
+The `agents/`, `enrichment.py`, and `cli.py audit/chat/batch` components are retained for compatibility. They implement demonstration-only generic thresholds and a mock conversational responder; **they do not perform clinical GFR interpretation or establish CAP/CLSI/ISO validation**. The HMAC audit log is process-local and should not be considered a production-grade security or medical record system. The `AUDIT_SECRET_KEY` variable is required by Docker Compose.
+
+## Privacy and security
+
+The static application runs locally in the browser. It does not transmit or persist inputs and uses no analytics, cookies, or remote dependencies. Do not enter patient identifiers. The server-based legacy module uses a limited regex identifier filter; **it is not a complete de-identification system or HIPAA compliance guarantee**. Keep any server deployment behind appropriate authentication and network restrictions; legacy endpoints are not authenticated.
+
+## Development and verification
+
 ```bash
-curl -X POST http://localhost:8000/api/audit \
-  -H "Content-Type: application/json" \
-  -d '{
-    "task_id": "TASK-001",
-    "target_identifier": "SPECIMEN-001",
-    "primary_metric": 28.5,
-    "secondary_metric": 14.2,
-    "status_descriptor": "DISCORDANT_ANOMALY",
-    "is_critical_flag": true
-  }'
+python -m pip install -e ".[dev]"
+python -m pytest -q
+node --test tests/test_web.cjs
+python -m compileall -q kinetic_gfr.py cli.py agents tests
 ```
 
----
-
-## Input Data Schema
-
-### CSV Batch Format
-```csv
-Patient_ID,v1,v2,v3
-PT-101,14.5,4.2,1.8
-PT-102,8.0,2.1,0.5
-PT-103,28.4,12.0,5.5
-```
-
-### API Payload
-| Field | Type | Required | Description |
-|:------|:-----|:---------|:------------|
-| `task_id` | string | Yes | Unique task/case identifier |
-| `target_identifier` | string | Yes | Entity or specimen target |
-| `primary_metric` | float | Yes | Primary measurement value |
-| `secondary_metric` | float | No | Secondary kinetic score |
-| `status_descriptor` | string | No | Status code (default: NOMINAL) |
-| `is_critical_flag` | boolean | No | Emergency escalation flag |
-
----
-
-## Architecture
-
-### Core Modules
-- **`kinetic_gfr.py`** - Core calculation engine with single/batch processing
-- **`cli.py`** - Enterprise CLI with audit, chat, batch, and serve commands
-- **`agents/`** - Multi-agent orchestration framework:
-  - `supervisor.py` - Master orchestrator
-  - `workers.py` - Specialized domain workers (QC, Safety, Protocol)
-  - `base.py` - Security guards, PHI protection, audit trail
-  - `api.py` - FastAPI REST endpoints
-  - `models.py` - Pydantic data schemas
-  - `llm_factory.py` - LLM provider abstraction
-  - `metrics.py` - Prometheus metrics exporter
-  - `learning.py` - Bayesian calibration engine
-  - `streamer.py` - WebSocket telemetry broadcaster
-- **`enrichment.py`** - Extended domain feature engines
-
-### Security Features
-- **Zero-PHI Outbound Guard:** Regex-based detection blocking SSNs, MRNs, phone numbers, emails
-- **HMAC-SHA256 Audit Trail:** Cryptographically chained, tamper-evident logging
-- **Input Validation:** Pydantic schema validation on all API endpoints
-
----
-
-## Testing
-
-### Run All Tests
-```bash
-pytest -v
-```
-
-### Test Coverage
-- `test_kinetic_gfr.py` - Core calculation and batch processing
-- `tests/test_kinetic_gfr_dynamic_calculator.py` - Multi-agent system, workers, audit
-- `tests/test_enrichment.py` - Enrichment engine suite
-
-### Run Simulator
-```bash
-python simulator.py 100
-```
-
----
+CI tests Python 3.10–3.12, checks dependencies, exercises the API, and verifies browser formula parity. GitHub Pages publishes the `web/` directory on merges to `master` when Pages is configured for GitHub Actions. The browser math is plain JavaScript, so Pyodide is unnecessary.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+[MIT](LICENSE).
