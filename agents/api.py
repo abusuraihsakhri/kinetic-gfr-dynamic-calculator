@@ -12,8 +12,8 @@ supervisor = SystemSupervisor(model_provider="mock")
 
 app = FastAPI(
     title="Kinetic Gfr Dynamic Calculator API",
-    description="Enterprise Distributed Component Platform (Clinical & Biomedical AI)",
-    version="3.0.0-ENTERPRISE",
+    description="Chen kinetic GFR endpoint and legacy demonstration-only agent endpoints",
+    version="3.1.0",
 )
 
 
@@ -23,7 +23,7 @@ class ChatRequest(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "HEALTHY", "service": "kinetic-gfr-dynamic-calculator", "domain": "Clinical & Biomedical AI", "standard": "CAP / CLSI / ISO Standards", "version": "3.0.0-ENTERPRISE"}
+    return {"status": "HEALTHY", "service": "kinetic-gfr-dynamic-calculator", "domain": "Clinical & Biomedical AI", "standard": "Legacy audit endpoints are demonstration-only", "version": "3.1.0"}
 
 
 @app.get("/metrics")
