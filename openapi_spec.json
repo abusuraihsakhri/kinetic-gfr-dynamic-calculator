@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Kinetic Gfr Dynamic Calculator API",
-    "description": "Enterprise Distributed Component Platform (Clinical & Cryptographic AI) adhering to CAP / CLSI / NIST Standards.",
-    "version": "3.0.0-ENTERPRISE",
+    "description": "Chen kinetic GFR endpoint plus legacy demonstration-only audit and mock chat endpoints. See /openapi.json on a running server for generated full schema.",
+    "version": "3.1.0",
     "contact": {
       "name": "Dr. Abu Suraih Sakhri",
       "url": "https://github.com/abusuraihsakhri"
@@ -25,14 +25,14 @@
         "summary": "Prometheus operational metrics",
         "responses": {
           "200": {
-            "description": "Prometheus text metrics"
+            "description": "Process-local operational metrics as JSON (not Prometheus text)"
           }
         }
       }
     },
     "/api/audit": {
       "post": {
-        "summary": "Dispatch task payload across specialized workers",
+        "summary": "Legacy demonstration worker rules (not clinically validated)",
         "requestBody": {
           "content": {
             "application/json": {
@@ -76,7 +76,7 @@
     },
     "/api/chat": {
       "post": {
-        "summary": "Air-gapped supervisory conversational assistant",
+        "summary": "Return a mock response (no model inference or clinical verification)",
         "requestBody": {
           "content": {
             "application/json": {
@@ -107,6 +107,71 @@
         "responses": {
           "200": {
             "description": "Cryptographic audit trail"
+          }
+        }
+      }
+    },
+    "/api/kinetic-gfr": {
+      "post": {
+        "summary": "Estimate Chen 2013 kinetic GFR",
+        "description": "Educational estimate; not measured GFR, AKI staging, or dosing advice.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "steady_state_creatinine",
+                  "baseline_gfr",
+                  "creatinine_1",
+                  "creatinine_2",
+                  "hours"
+                ],
+                "properties": {
+                  "steady_state_creatinine": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "baseline_gfr": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "creatinine_1": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "creatinine_2": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "hours": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "max_creatinine_rise_per_day": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "unit": {
+                    "type": "string",
+                    "enum": [
+                      "mg/dL",
+                      "umol/L"
+                    ],
+                    "default": "mg/dL"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Kinetic GFR estimate and intermediate values"
+          },
+          "422": {
+            "description": "Invalid input or nonphysical model estimate"
           }
         }
       }

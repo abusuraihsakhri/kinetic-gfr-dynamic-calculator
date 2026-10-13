@@ -1,4 +1,4 @@
-Patient_ID,v1,v2,v3
-PT-101,14.5,4.2,1.8
-PT-102,8.0,2.1,0.5
-PT-103,28.4,12.0,5.5
+steady_state_creatinine,baseline_gfr,creatinine_1,creatinine_2,hours,max_creatinine_rise_per_day,unit
+1,90,1.8,2.4,24,1.5,mg/dL
+1,90,2.4,1.8,24,1.5,mg/dL
+88.4,90,159.12,212.16,24,1.5,umol/L

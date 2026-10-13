@@ -1,6 +1,6 @@
 """
 Enrichment Feature Implementation for kinetic-gfr-dynamic-calculator.
-Generated based on domain-specific requirements in specifications.
+Demonstration-only scoring; thresholds are not validated clinical rules.
 """
 from dataclasses import dataclass, field
 from typing import Dict, Any, List, Optional, Tuple
@@ -39,13 +39,13 @@ class EnrichmentIdeasImplementationPlansEngine:
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
             alerts.append(f"Enrichment Ideas & Implementation Plans: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
-            recs.append("Initiate immediate protocol review and escalate to attending lead.")
+            recs.append("Demonstration threshold only; no clinical action is implied.")
         elif primary_value > self.threshold:
             status = "WARNING"
             alerts.append(f"Enrichment Ideas & Implementation Plans: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
-            recs.append("Increase monitoring frequency and perform secondary verification.")
+            recs.append("Illustrative threshold; validate against independent clinical criteria.")
         else:
-            recs.append("Parameters nominal under standard operating bounds.")
+            recs.append("Below illustrative threshold; no clinical interpretation.")
 
         res = EnrichmentIdeasImplementationPlansEngineResult(
             feature_name="Enrichment Ideas & Implementation Plans",
@@ -89,13 +89,13 @@ class AkiEngine:
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
             alerts.append(f"AKI: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
-            recs.append("Initiate immediate protocol review and escalate to attending lead.")
+            recs.append("Demonstration threshold only; no clinical action is implied.")
         elif primary_value > self.threshold:
             status = "WARNING"
             alerts.append(f"AKI: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
-            recs.append("Increase monitoring frequency and perform secondary verification.")
+            recs.append("Illustrative threshold; validate against independent clinical criteria.")
         else:
-            recs.append("Parameters nominal under standard operating bounds.")
+            recs.append("Below illustrative threshold; no clinical interpretation.")
 
         res = AkiEngineResult(
             feature_name="AKI",
@@ -139,13 +139,13 @@ class NephrotoxicEngine:
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
             alerts.append(f"Nephrotoxic: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
-            recs.append("Initiate immediate protocol review and escalate to attending lead.")
+            recs.append("Demonstration threshold only; no clinical action is implied.")
         elif primary_value > self.threshold:
             status = "WARNING"
             alerts.append(f"Nephrotoxic: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
-            recs.append("Increase monitoring frequency and perform secondary verification.")
+            recs.append("Illustrative threshold; validate against independent clinical criteria.")
         else:
-            recs.append("Parameters nominal under standard operating bounds.")
+            recs.append("Below illustrative threshold; no clinical interpretation.")
 
         res = NephrotoxicEngineResult(
             feature_name="Nephrotoxic",
@@ -189,13 +189,13 @@ class FluidEngine:
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
             alerts.append(f"Fluid: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
-            recs.append("Initiate immediate protocol review and escalate to attending lead.")
+            recs.append("Demonstration threshold only; no clinical action is implied.")
         elif primary_value > self.threshold:
             status = "WARNING"
             alerts.append(f"Fluid: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
-            recs.append("Increase monitoring frequency and perform secondary verification.")
+            recs.append("Illustrative threshold; validate against independent clinical criteria.")
         else:
-            recs.append("Parameters nominal under standard operating bounds.")
+            recs.append("Below illustrative threshold; no clinical interpretation.")
 
         res = FluidEngineResult(
             feature_name="Fluid",
@@ -239,13 +239,13 @@ class ContinuousEngine:
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
             alerts.append(f"Continuous: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
-            recs.append("Initiate immediate protocol review and escalate to attending lead.")
+            recs.append("Demonstration threshold only; no clinical action is implied.")
         elif primary_value > self.threshold:
             status = "WARNING"
             alerts.append(f"Continuous: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
-            recs.append("Increase monitoring frequency and perform secondary verification.")
+            recs.append("Illustrative threshold; validate against independent clinical criteria.")
         else:
-            recs.append("Parameters nominal under standard operating bounds.")
+            recs.append("Below illustrative threshold; no clinical interpretation.")
 
         res = ContinuousEngineResult(
             feature_name="Continuous",
@@ -289,13 +289,13 @@ class ContrastEngine:
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
             alerts.append(f"Contrast: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
-            recs.append("Initiate immediate protocol review and escalate to attending lead.")
+            recs.append("Demonstration threshold only; no clinical action is implied.")
         elif primary_value > self.threshold:
             status = "WARNING"
             alerts.append(f"Contrast: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
-            recs.append("Increase monitoring frequency and perform secondary verification.")
+            recs.append("Illustrative threshold; validate against independent clinical criteria.")
         else:
-            recs.append("Parameters nominal under standard operating bounds.")
+            recs.append("Below illustrative threshold; no clinical interpretation.")
 
         res = ContrastEngineResult(
             feature_name="Contrast",
@@ -339,13 +339,13 @@ class TransplantEngine:
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
             alerts.append(f"Transplant: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
-            recs.append("Initiate immediate protocol review and escalate to attending lead.")
+            recs.append("Demonstration threshold only; no clinical action is implied.")
         elif primary_value > self.threshold:
             status = "WARNING"
             alerts.append(f"Transplant: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
-            recs.append("Increase monitoring frequency and perform secondary verification.")
+            recs.append("Illustrative threshold; validate against independent clinical criteria.")
         else:
-            recs.append("Parameters nominal under standard operating bounds.")
+            recs.append("Below illustrative threshold; no clinical interpretation.")
 
         res = TransplantEngineResult(
             feature_name="Transplant",
@@ -389,13 +389,13 @@ class EmrEngine:
         if primary_value > self.threshold * 2:
             status = "CRITICAL_ALERT"
             alerts.append(f"EMR: Primary value {primary_value:.2f} breached critical threshold ({self.threshold * 2:.2f})")
-            recs.append("Initiate immediate protocol review and escalate to attending lead.")
+            recs.append("Demonstration threshold only; no clinical action is implied.")
         elif primary_value > self.threshold:
             status = "WARNING"
             alerts.append(f"EMR: Value {primary_value:.2f} exceeds baseline threshold ({self.threshold:.2f})")
-            recs.append("Increase monitoring frequency and perform secondary verification.")
+            recs.append("Illustrative threshold; validate against independent clinical criteria.")
         else:
-            recs.append("Parameters nominal under standard operating bounds.")
+            recs.append("Below illustrative threshold; no clinical interpretation.")
 
         res = EmrEngineResult(
             feature_name="EMR",
