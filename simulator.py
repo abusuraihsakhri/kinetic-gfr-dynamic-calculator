@@ -15,7 +15,8 @@ def run_simulation(iterations: int = 100):
     nominal_count = 0
     elevated_count = 0
     critical_count = 0
-    phi_blocked_count = 0\n    phi_test_count = 0
+    phi_blocked_count = 0
+    phi_test_count = 0
 
     for i in range(iterations):
         # 1. Normal / Elevated / Critical payload distribution
@@ -43,6 +44,7 @@ def run_simulation(iterations: int = 100):
 
         # 2. Adversarial PHI test injection (every 25 iterations)
         if (i + 1) % 25 == 0:
+            phi_test_count += 1
             try:
                 PHIGuard.assert_no_phi(f"Patient John Doe MRN-{random.randint(100000, 999999)} test")
             except SecurityException:
