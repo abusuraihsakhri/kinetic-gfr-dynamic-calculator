@@ -3,7 +3,7 @@ Live WebSocket Distributed Component Telemetry Streamer for kinetic-gfr-dynamic-
 """
 import json
 import asyncio
-from typing import Any
+from typing import Any, Dict, List
 
 class TelemetryBroadcaster:
     """Broadcasts distributed component reasoning steps in real-time to active WebSocket clients."""
