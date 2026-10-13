@@ -4,7 +4,7 @@ build-backend = "setuptools.backends._legacy:_Backend"
 
 [project]
 name = "kinetic-gfr-dynamic-calculator"
-version = "3.0.0"
+version = "3.1.0"
 description = "Kinetic eGFR (KeGFR) for Rapidly Changing Creatinine - Clinical Decision Support"
 readme = "README.md"
 license = {text = "MIT"}
@@ -34,7 +34,11 @@ dev = [
 ]
 
 [project.scripts]
-kinetic-gfr = "cli:main"
+kinetic-gfr = "kinetic_gfr:main"
+kinetic-gfr-agent = "cli:main"
+
+[tool.setuptools]
+py-modules = ["kinetic_gfr", "cli", "enrichment", "simulator"]
 
 [tool.setuptools.packages.find]
 include = ["agents*"]
